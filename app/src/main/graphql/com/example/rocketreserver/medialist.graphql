@@ -1,0 +1,17 @@
+query MediaListQuery($userId:Int,$mediaId:Int $type:MediaType){
+
+    mediaList: MediaList(mediaId: $mediaId, userId: $userId, type: $type){
+        ... mediaListEntry
+
+    }
+}
+
+
+fragment mediaListEntry on MediaList {
+    advancedScores
+    media{
+        title{
+            english
+        }
+    }
+}

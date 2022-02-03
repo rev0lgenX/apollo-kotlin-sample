@@ -1,12 +1,15 @@
 package com.example.rocketreserver
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.delay
+import com.apollographql.apollo3.api.Optional
+import com.example.rocketreserver.type.MediaType
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -16,23 +19,23 @@ class MainActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_main)
 
+        val query = MediaListQuery(
+            userId = Optional.presentIfNotNull(262143),
+            mediaId = Optional.presentIfNotNull(99263),
+            type = Optional.presentIfNotNull(MediaType.ANIME)
+        )
+
         lifecycleScope.launch {
-            apolloClient(this@MainActivity).subscription(TripsBookedSubscription()).toFlow()
-                .retryWhen { _, attempt ->
-                    delay(attempt * 1000)
-                    true
+            apolloClient(this@MainActivity).query(query).toFlow()
+                .catch {
+                    Log.wtf(MainActivity::class.java.simpleName, it)
+                    Toast.makeText(this@MainActivity, "error", Toast.LENGTH_SHORT).show()
                 }
                 .collect {
-                    val text = when (val trips = it.data?.tripsBooked) {
-                        null -> getString(R.string.subscriptionError)
-                        -1 -> getString(R.string.tripCancelled)
-                        else -> getString(R.string.tripBooked, trips)
+                    Toast.makeText(this@MainActivity, "successs", Toast.LENGTH_SHORT).show()
+                    it.data?.mediaList?.mediaListEntry?.let {
+                        findViewById<TextView>(R.id.title).text = it.media?.title?.english ?: ""
                     }
-                    Snackbar.make(
-                        findViewById(R.id.main_frame_layout),
-                        text,
-                        Snackbar.LENGTH_LONG
-                    ).show()
                 }
         }
     }

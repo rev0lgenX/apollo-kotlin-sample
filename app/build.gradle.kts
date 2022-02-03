@@ -50,6 +50,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
 
     implementation("com.apollographql.apollo3:apollo-runtime:3.0.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
 }
 
 apollo {
