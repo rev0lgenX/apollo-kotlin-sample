@@ -55,4 +55,5 @@ dependencies {
 
 apollo {
     packageName.set("com.example.rocketreserver")
+    customScalarsMapping.set(mapOf("Json" to "kotlin.Any"))
 }
